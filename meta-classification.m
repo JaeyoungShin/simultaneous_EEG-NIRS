@@ -1,7 +1,8 @@
 % This MATLAB script can be used to reproduce the result in Figure 12
 % Please download BBCItoolbox to 'MyToolboxDir'
 % Please download dataset to 'NirsMyDataDir' and 'EegMyDataDir'
-
+% The authors would be grateful if published reports of research using this code 
+% (or a modified version, maintaining a significant portion of the original code) would cite the following article:
 
 clear all; clc; close all;
 
