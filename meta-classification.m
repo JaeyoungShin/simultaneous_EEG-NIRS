@@ -120,7 +120,7 @@ for vp = 1 : length(subdir_list.nirs)
                 clear csp_train csp_test
                 test = (indices{shiftIdx} == foldIdx); train = ~test;
                 
-                % deoxy
+                % HbR
                 x_train.deoxy.x = [squeeze(ave.deoxy{stepIdx}.x(:,:,train)); squeeze(slope.deoxy{stepIdx}.x(:,:,train))];
                 x_train.deoxy.y = squeeze(ave.deoxy{stepIdx}.y(:,train));
                 x_train.deoxy.clab = ave.deoxy{stepIdx}.clab;
@@ -129,7 +129,7 @@ for vp = 1 : length(subdir_list.nirs)
                 x_test.deoxy.y = squeeze(ave.deoxy{stepIdx}.y(:,test));
                 x_test.deoxy.clab = ave.deoxy{stepIdx}.clab;
                 
-                % oxy
+                % HbO
                 x_train.oxy.x = [squeeze(ave.oxy{stepIdx}.x(:,:,train)); squeeze(slope.oxy{stepIdx}.x(:,:,train))];
                 x_train.oxy.y   = squeeze(ave.oxy{stepIdx}.y(:,train));
                 x_train.oxy.clab   = ave.oxy{stepIdx}.clab;
@@ -138,7 +138,7 @@ for vp = 1 : length(subdir_list.nirs)
                 x_test.oxy.y = squeeze(ave.oxy{stepIdx}.y(:,test));
                 x_test.oxy.clab = ave.oxy{stepIdx}.clab;
                 
-                % eeg
+                % EEG
                 x_train.eeg.x = segment{stepIdx}.x(:,:,train);
                 x_train.eeg.y = segment{stepIdx}.y(:,train);
                 x_train.eeg.clab = segment{stepIdx}.clab;
@@ -169,12 +169,12 @@ for vp = 1 : length(subdir_list.nirs)
                 fv_train.eeg.x   = logvar_train.x;   fv_train.eeg.y   = x_train.eeg.y;   fv_train.eeg.className  = {'VF','BL'};
                 fv_test.eeg.x    = logvar_test.x;   fv_test.eeg.y    = x_test.eeg.y;    fv_test.eeg.className    = {'VF','BL'};
                 
-                % for eeg only
+                % for EEG only
                 fv_train.eeg.x = squeeze(fv_train.eeg.x);
                 fv_test.eeg.x  = squeeze(fv_test.eeg.x);
                 
-                y_train  = group(:,train); % y_train은 EEG, NIRS 같이 사용, 구분하지 않음
-                y_test   = vec2ind(group(:,test));  % y_train은 EEG, NIRS 같이 사용, 구분하지 않음
+                y_train  = group(:,train); % y_train for EEG == y_train for NIRS
+                y_test   = vec2ind(group(:,test));  % y_test for EEG == y_test for NIRS
                 
                 % train classifier
                 C.deoxy = train_RLDAshrink(fv_train.deoxy.x,y_train);
