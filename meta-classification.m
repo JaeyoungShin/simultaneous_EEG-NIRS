@@ -1,4 +1,8 @@
 % This MATLAB script can be used to reproduce the result in Figure 12
+% Please download BBCItoolbox to 'MyToolboxDir'
+% Please download dataset to 'NirsMyDataDir' and 'EegMyDataDir'
+
+
 clear all; clc; close all;
 
 %%%%%%%%%%%%%%%%%%%%%%%% modify directory paths properly %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
