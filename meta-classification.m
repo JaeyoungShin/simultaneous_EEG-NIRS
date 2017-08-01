@@ -83,9 +83,9 @@ for vp = 1 : length(subdir_list.nirs)
     %% Load EOG-free data
     loadDir = fullfile(EegMyDataDir,subdir_list.eeg{vp});
     cd(loadDir);
-    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     load cnt_vf; load mrk_vf; load mnt_vf;
-    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     cd(WorkingDir);
       
     %% Select EEG channels (exclude EOG channels) for classification
@@ -155,7 +155,7 @@ for vp = 1 : length(subdir_list.nirs)
                 x_test.eeg.clab = segment{stepIdx}.clab;
                 
                 
-                %%%%%%%%%%%%%%%%%%%%%% For EEG only %%%%%%%%%%%%%%%%%%%%%%%
+                %%%%%%%%%%%%%%%%%%%%%% For EEG only %%%%%%%%%%%%%%%%%%%%%%%%%%
                 % CSP
                 [csp_train, CSP_W, CSP_EIG, CSP_A] = proc_cspAuto(x_train.eeg,'patterns', floor(size(x_train.eeg.x,2)/2), 'normalize', 1,'score','medianvar','selectPolicy','equalperclass');
                 csp_test = proc_linearDerivation(x_test.eeg,CSP_W);
