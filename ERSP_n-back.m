@@ -26,8 +26,8 @@ cd(WorkingDir);
 addpath(genpath(pwd));
 
 %% initial parameter
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-subdir_list = {'VP001-EEG','VP002-EEG','VP003-EEG','VP004-EEG','VP005-EEG'};
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+subdir_list = {'VP001-EEG','VP002-EEG','VP003-EEG','VP004-EEG','VP005-EEG','VP006-EEG','VP007-EEG','VP008-EEG','VP009-EEG','VP010-EEG','VP011-EEG','VP012-EEG','VP013-EEG','VP014-EEG','VP015-EEG','VP016-EEG','VP017-EEG','VP018-EEG','VP019-EEG','VP020-EEG','VP021-EEG','VP022-EEG','VP023-EEG','VP024-EEG','VP025-EEG','VP026-EEG'};
 ival_epo = [-15 60]*1000;
 ival_base  = [-5 -2]*1000;
 
@@ -38,7 +38,7 @@ clim = [-3 3];
 
 % subplot index for EEG channels
 subplotIdx = [4 12 14 13 20 22 28 30 32 38 40 46 48 50 59 58 6 16 15 24 26 34 36 42 44 52 54 60];
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 for vp = 1 : length(subdir_list)
     
@@ -46,6 +46,7 @@ for vp = 1 : length(subdir_list)
     loadDir = fullfile(EegMyDataDir,subdir_list{vp});
     cd(loadDir);
     load cnt_nback; load mrk_nback; load mnt_nback;
+    cd(WorkingDir);
     
     % marker selection
     mrk_0back = mrk_selectClasses(mrk_nback, '0-back session');
@@ -62,7 +63,7 @@ for vp = 1 : length(subdir_list)
     ssn_2back.x1 = permute(ssn_2back.x, [2, 1, 3]); % nch x nsamples x ntrials
     ssn_3back.x1 = permute(ssn_3back.x, [2, 1, 3]); % nch x nsamples x ntrials
     
-    for ch = 1 : length(eegclab)
+    for ch = 1 : length(mnt_nback.clab)-2 % exclude two EOG channels
         chdata_0back = ssn_0back.x1(ch,:,:);
         chdata_2back = ssn_2back.x1(ch,:,:);
         chdata_3back = ssn_3back.x1(ch,:,:);
@@ -93,21 +94,30 @@ ave_2back = mean(ersp_2back,4);
 ave_3back = mean(ersp_3back,4);
 
 %% plot ERSP
-for ch = 1 : length(eegclab)-2
-    figure(1)
+clab = cnt_nback.clab;
+ 
+figure(1)
+for ch = 1 : length(clab)-2
     subplot(7,9,subplotIdx(ch));
-    imagesc(times/1000,freqs,ave_0back(:,:,ch), clim); title(eegclab{ch});
-    set(gca, 'YDir','normal'); ylim([1 40]); colormap('jet');
-    
-    figure(2)
-    subplot(7,9,subplotIdx(ch));
-    imagesc(times/1000,freqs,ave_2back(:,:,ch), clim); title(eegclab{ch});
-    set(gca, 'YDir','normal'); ylim([1 40]); colormap('jet');
-    
-    figure(3)
-    subplot(7,9,subplotIdx(ch));
-    imagesc(times/1000,freqs,ave_3back(:,:,ch), clim); title(eegclab{ch});
-    set(gca, 'YDir','normal'); ylim([1 40]); colormap('jet');
+    imagesc(times/1000,freqs,ave_0back(:,:,ch), clim); title(clab{ch});
+    set(gca, 'YDir','normal'); ylim([1 40]); colormap(cmap_posneg(101));
 end
+colorbar('OuterPosition', [0.645 0.828 0.016 0.09]);
+
+figure(2)
+for ch = 1 : length(clab)-2
+    subplot(7,9,subplotIdx(ch));
+    imagesc(times/1000,freqs,ave_2back(:,:,ch), clim); title(clab{ch});
+    set(gca, 'YDir','normal'); ylim([1 40]); colormap(cmap_posneg(101));
+end
+colorbar('OuterPosition', [0.645 0.828 0.016 0.09]);
+
+figure(3)
+for ch = 1 : length(clab)-2
+    subplot(7,9,subplotIdx(ch));
+    imagesc(times/1000,freqs,ave_3back(:,:,ch), clim); title(clab{ch});
+    set(gca, 'YDir','normal'); ylim([1 40]); colormap(cmap_posneg(101));
+end
+colorbar('OuterPosition', [0.645 0.828 0.016 0.09]);
 
 rmpath(genpath(pwd));
