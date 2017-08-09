@@ -1,3 +1,12 @@
+% This MATLAB script can be used to reproduce the result of n-back ERP
+%
+% Please download BBCItoolbox to 'MyToolboxDir'
+% Please download dataset to 'NirsMyDataDir' and 'EegMyDataDir'
+% The authors would be grateful if published reports of research using this code
+% (or a modified version, maintaining a significant portion of the original code) would cite the following article:
+% Shin et al. "Simultaneous acquisition of EEG and NIRS during cognitive tasks for an open access dataset",
+% Scientific data (2017), under review.
+
 clear all; clc; close all;
 
 %%%%%%%%%%%%%%%%%%%%%%%% modify directory paths properly %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
