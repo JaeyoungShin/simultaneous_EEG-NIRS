@@ -1,0 +1,237 @@
+% This MATLAB script can be used to reproduce the result of behavioral data for datasets A and B
+%
+% Please download BBCItoolbox to 'MyToolboxDir'
+% Please download dataset to 'NirsMyDataDir' and 'EegMyDataDir'
+% The authors would be grateful if published reports of research using this code
+% (or a modified version, maintaining a significant portion of the original code) would cite the following article:
+% Shin et al. "Simultaneous acquisition of EEG and NIRS during cognitive tasks for an open access dataset",
+% Scientific data (2017), under review.
+
+clc; clear all; close all;
+
+%%%%%%%%%%%%%%%%%%%%%%%% modify directory paths properly %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Please download behavioral data from Github (behavior.zip) and unzip to BehaviorDir
+BehaviorDir = fullfile('F:','scientific_data_publish','statistic');
+NBDir = fullfile(BehaviorDir,'N-back','summary');
+GNGDir = fullfile(BehaviorDir,'Go-NoGo','summary');
+WorkingDir = fullfile('C:','Users','Shin','Documents','MATLAB','scientific_data');
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%% Initial parameter
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+subdir_list = {'VP001-EEG','VP002-EEG','VP003-EEG','VP004-EEG','VP005-EEG','VP006-EEG','VP007-EEG','VP008-EEG','VP009-EEG','VP010-EEG','VP011-EEG','VP012-EEG','VP013-EEG','VP014-EEG','VP015-EEG','VP016-EEG','VP017-EEG','VP018-EEG','VP019-EEG','VP020-EEG','VP021-EEG','VP022-EEG','VP023-EEG','VP024-EEG','VP025-EEG','VP026-EEG'};
+Dataset = 'A'; % A: n-back / B: GO/No-go
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%% Behavioral data analysis
+
+if strcmp(Dataset,'A')
+    for vp = 1 : length(subdir_list)
+        vpDir = fullfile(StatNBDir, subdir_list{vp});
+        
+        cd(vpDir);
+        load summary1; load summary2; load summary3;
+        
+        % flag conversion: summary1 (session 1 data)
+        summary1.flag_org = summary1.flag;
+        summary1.flag = zeros(9,20);
+        for i = 1 : size(summary1.flag,1)
+            switch summary1.nback(i)
+                case 0
+                    summary1.flag(i,:) = 1;
+                case 2
+                    for j = 3 : size(summary1.flag,2)
+                        if summary1.flag_org(i, j-2) == summary1.flag_org(i, j)
+                            summary1.flag(i,j) = 2;
+                        end
+                    end
+                    
+                case 3
+                    for j = 4 : size(summary1.flag,2)
+                        if summary1.flag_org(i, j-3) == summary1.flag_org(i, j)
+                            summary1.flag(i,j) = 3;
+                        end
+                    end
+            end
+        end
+        
+        % flag conversion: summary2 (session 2 data)
+        summary2.flag_org = summary2.flag;
+        summary2.flag = zeros(9,20);
+        for i = 1 : size(summary2.flag,1)
+            switch summary2.nback(i)
+                case 0
+                    summary2.flag(i,:) = 1;
+                case 2
+                    for j = 3 : size(summary2.flag,2)
+                        if summary2.flag_org(i, j-2) == summary2.flag_org(i, j)
+                            summary2.flag(i,j) = 2;
+                        end
+                    end
+                    
+                case 3
+                    for j = 4 : size(summary2.flag,2)
+                        if summary2.flag_org(i, j-3) == summary2.flag_org(i, j)
+                            summary2.flag(i,j) = 3;
+                        end
+                    end
+            end
+        end
+        
+        % flag conversion: summary3 (session 3 data)
+        summary3.flag_org = summary3.flag;
+        summary3.flag = zeros(9,20);
+        for i = 1 : size(summary3.flag ,1)
+            switch summary3.nback(i)
+                case 0
+                    summary3.flag (i,:) = 1;
+                case 2
+                    for j = 3 : size(summary3.flag ,2)
+                        if summary3.flag_org(i, j-2) == summary3.flag_org(i, j)
+                            summary3.flag (i,j) = 2;
+                        end
+                    end
+                    
+                case 3
+                    for j = 4 : size(summary3.flag ,2)
+                        if summary3.flag_org(i, j-3) == summary3.flag_org(i, j)
+                            summary3.flag (i,j) = 3;
+                        end
+                    end
+            end
+        end
+        
+        % n-back
+        target_0back = 1;
+        target_2back = 2;
+        target_3back = 3;
+        
+        % 0-back
+        goInd.nback_0back(:,1) = find(summary1.flag == target_0back); goResult.nback_0back(:,1) = summary1.result(goInd.nback_0back(:,1));
+        goInd.nback_0back(:,2) = find(summary2.flag == target_0back); goResult.nback_0back(:,2) = summary2.result(goInd.nback_0back(:,2));
+        goInd.nback_0back(:,3) = find(summary3.flag == target_0back); goResult.nback_0back(:,3) = summary3.result(goInd.nback_0back(:,3));
+        
+        % 2-back
+        goInd.nback_2back(:,1) = find(summary1.flag == target_2back); goResult.nback_2back(:,1) = summary1.result(goInd.nback_2back(:,1));
+        goInd.nback_2back(:,2) = find(summary2.flag == target_2back); goResult.nback_2back(:,2) = summary2.result(goInd.nback_2back(:,2));
+        goInd.nback_2back(:,3) = find(summary3.flag == target_2back); goResult.nback_2back(:,3) = summary3.result(goInd.nback_2back(:,3));
+        
+        % 3-back
+        goInd.nback_3back(:,1) = find(summary1.flag == target_3back); goResult.nback_3back(:,1) = summary1.result(goInd.nback_3back(:,1));
+        goInd.nback_3back(:,2) = find(summary2.flag == target_3back); goResult.nback_3back(:,2) = summary2.result(goInd.nback_3back(:,2));
+        goInd.nback_3back(:,3) = find(summary3.flag == target_3back); goResult.nback_3back(:,3) = summary3.result(goInd.nback_3back(:,3));
+        
+        disp(subdir_list{vp})
+        T0 = table(goInd.nback_0back(:,1), goResult.nback_0back(:,1), goInd.nback_0back(:,2), goResult.nback_0back(:,2), goInd.nback_0back(:,3), goResult.nback_0back(:,3), 'VariableNames', {'Ind1' 'Res1' 'Ind2' 'Res2 ' 'Ind3' 'Res3'})
+        T2 = table(goInd.nback_2back(:,1), goResult.nback_2back(:,1), goInd.nback_2back(:,2), goResult.nback_2back(:,2), goInd.nback_2back(:,3), goResult.nback_2back(:,3), 'VariableNames', {'Ind1' 'Res1' 'Ind2' 'Res2 ' 'Ind3' 'Res3'})
+        T3 = table(goInd.nback_3back(:,1), goResult.nback_3back(:,1), goInd.nback_3back(:,2), goResult.nback_3back(:,2), goInd.nback_3back(:,3), goResult.nback_3back(:,3), 'VariableNames', {'Ind1' 'Res1' 'Ind2' 'Res2 ' 'Ind3' 'Res3'})
+        
+        % correct ratio
+        ratio.correct.nback_0back(vp,1) = length(find(goResult.nback_0back == 1)) / (size(goResult.nback_0back,1)*size(goResult.nback_0back,2));
+        ratio.miss.nback_0back(vp,1) = length(find(goResult.nback_0back == -1)) / (size(goResult.nback_0back,1)*size(goResult.nback_0back,2));
+        ratio.incorrect.nback_0back(vp,1) = length(find(goResult.nback_0back == 0)) / (size(goResult.nback_0back,1)*size(goResult.nback_0back,2));
+        
+        ratio.correct.nback_2back(vp,1) = length(find(goResult.nback_2back == 1)) / (size(goResult.nback_2back,1)*size(goResult.nback_2back,2));
+        ratio.miss.nback_2back(vp,1) = length(find(goResult.nback_2back == -1)) / (size(goResult.nback_2back,1)*size(goResult.nback_2back,2));
+        ratio.incorrect.nback_2back(vp,1) = length(find(goResult.nback_2back == 0)) / (size(goResult.nback_2back,1)*size(goResult.nback_2back,2));
+        
+        ratio.correct.nback_3back(vp,1) = length(find(goResult.nback_3back == 1)) / (size(goResult.nback_3back,1)*size(goResult.nback_3back,2));
+        ratio.miss.nback_3back(vp,1) = length(find(goResult.nback_3back == -1)) / (size(goResult.nback_3back,1)*size(goResult.nback_3back,2));
+        ratio.incorrect.nback_3back(vp,1) = length(find(goResult.nback_3back == 0)) / (size(goResult.nback_3back,1)*size(goResult.nback_3back,2));
+        
+        
+        % reaction time
+        react.correct.nback_0back(vp,1) = mean([summary1.reaction_time(find(((summary1.response == 7) | (summary1.response == 8)) & (summary1.flag == target_0back))); summary2.reaction_time(find((summary2.response == 7) & (summary2.flag == target_0back))); summary3.reaction_time(find((summary3.response == 7) & (summary3.flag == target_0back)))]);
+        react.correct.nback_2back(vp,1) = mean([summary1.reaction_time(find((summary1.response == 7) & (summary1.flag == target_2back))); summary2.reaction_time(find((summary2.response == 7) & (summary2.flag == target_2back))); summary3.reaction_time(find((summary3.response == 7) & (summary3.flag == target_2back)))]);
+        react.correct.nback_3back(vp,1) = mean([summary1.reaction_time(find((summary1.response == 7) & (summary1.flag == target_3back))); summary2.reaction_time(find((summary2.response == 7) & (summary2.flag == target_3back))); summary3.reaction_time(find((summary3.response == 7) & (summary3.flag == target_3back)))]);
+        
+        % disp
+        disp(['correct (0-back) = ', num2str(ratio.correct.nback_0back(vp,1))]);
+        disp(['miss (0-back) = ', num2str(ratio.miss.nback_0back(vp,1))]);
+        disp(['incorrect (0-back) = ', num2str(ratio.incorrect.nback_0back(vp,1))]);
+        disp(' ');
+        disp(['correct (2-back) = ', num2str(ratio.correct.nback_2back(vp,1))]);
+        disp(['miss (2-back) = ', num2str(ratio.miss.nback_2back(vp,1))]);
+        disp(['incorrect (2-back) = ', num2str(ratio.incorrect.nback_2back(vp,1))]);
+        disp(' ');
+        disp(['correct (3-back) = ', num2str(ratio.correct.nback_3back(vp,1))]);
+        disp(['miss (3-back) = ', num2str(ratio.miss.nback_3back(vp,1))]);
+        disp(['incorrect (3-back) = ', num2str(ratio.incorrect.nback_3back(vp,1))]);
+        disp(' ');
+        disp(['0-back reaction time (correct) = ', num2str(react.correct.nback_0back(vp,1))]);
+        disp(['2-back reaction time (correct) = ', num2str(react.correct.nback_2back(vp,1))]);
+        disp(['3-back reaction time (correct) = ', num2str(react.correct.nback_3back(vp,1))]);
+    end
+    
+    disp('------------------------------------------------------------');
+    disp(['Grand average 0-back correct response ratio: ', num2str(mean(ratio.correct.nback_0back))]);
+    disp(['Grand average 2-back correct response ratio: ', num2str(mean(ratio.correct.nback_2back))]);
+    disp(['Grand average 3-back correct response : ', num2str(mean(ratio.correct.nback_3back))]);
+    disp(' ');
+    disp(['Grand average 0-back miss response ratio.: ', num2str(mean(ratio.miss.nback_0back))]);
+    disp(['Grand average 2-back miss response ratio: ', num2str(mean(ratio.miss.nback_2back))]);
+    disp(['Grand average 3-back miss response ratio: ', num2str(mean(ratio.miss.nback_3back))]);
+    disp(' ');
+    disp(['Grand average 0-back incorrect response ratio: ', num2str(mean(ratio.incorrect.nback_0back))]);
+    disp(['Grand average 2-back incorrect response ratio: ', num2str(mean(ratio.incorrect.nback_2back))]);
+    disp(['Grand average 3-back incorrect response ratio: ', num2str(mean(ratio.incorrect.nback_3back))]);
+    disp(' ');
+    disp(['Grand average 0-back reaction time (correct): ', num2str(mean(react.correct.nback_0back))]);
+    disp(['Grand average 2-back reaction time (correct): ', num2str(mean(react.correct.nback_2back))]);
+    disp(['Grand average 3-back reaction time (correct): ', num2str(mean(react.correct.nback_3back))]);
+    
+    [h.ratio,p.ratio] =  ttest(ratio.correct.nback_2back, ratio.correct.nback_3back);
+    [h.time,p.time] =  ttest(react.correct.nback_2back, react.correct.nback_3back);
+    
+end
+
+if strcmp(Dataset,'B')
+    for vp = 1 : length(subdir_list)
+        vpDir = fullfile(StatGNGDir, subdir_list{vp});
+        
+        cd(vpDir);
+        
+        load summary1; load summary2; load summary3;
+        
+        GOflag = 1; NOGOflag = 0;
+        
+        goInd.gonogo(:,1) = find(summary1.flag == GOflag); goResult.gonogo(:,1) = summary1.result(goInd.gonogo(:,1));
+        goInd.gonogo(:,2) = find(summary2.flag == GOflag); goResult.gonogo(:,2) = summary2.result(goInd.gonogo(:,2));
+        goInd.gonogo(:,3) = find(summary3.flag == GOflag); goResult.gonogo(:,3) = summary3.result(goInd.gonogo(:,3));
+        
+        nogoInd.gonogo(:,1) = find(summary1.flag == NOGOflag); nogoResult.gonogo(:,1) = summary1.result(nogoInd.gonogo(:,1));
+        nogoInd.gonogo(:,2) = find(summary2.flag == NOGOflag); nogoResult.gonogo(:,2) = summary2.result(nogoInd.gonogo(:,2));
+        nogoInd.gonogo(:,3) = find(summary3.flag == NOGOflag); nogoResult.gonogo(:,3) = summary3.result(nogoInd.gonogo(:,3));
+        
+        disp(subdir_list{vp})
+        TGO   = table(goInd.gonogo(:,1), goResult.gonogo(:,1), goInd.gonogo(:,2), goResult.gonogo(:,2), goInd.gonogo(:,3), goResult.gonogo(:,3), 'VariableNames', {'Ind1' 'Res1' 'Ind2' 'Res2 ' 'Ind3' 'Res3'})
+        TNOGO = table(nogoInd.gonogo(:,1), nogoResult.gonogo(:,1), nogoInd.gonogo(:,2), nogoResult.gonogo(:,2), nogoInd.gonogo(:,3), nogoResult.gonogo(:,3), 'VariableNames', {'Ind1' 'Res1' 'Ind2' 'Res2 ' 'Ind3' 'Res3'})
+        
+        % correct ratio
+        ratio.GOcorrect.gonogo(vp,1) = length(find(goResult.gonogo == 1)) / (size(goResult.gonogo,1)*size(goResult.gonogo,2));
+        ratio.GOincorrect.gonogo(vp,1) = 1 - ratio.GOcorrect.gonogo(vp,1);
+        
+        ratio.NOGOcorrect.gonogo(vp,1) = length(find(nogoResult.gonogo == 1)) / (size(nogoResult.gonogo,1)*size(nogoResult.gonogo,2));
+        ratio.NOGOincorrect.gonogo(vp,1) = 1 - ratio.NOGOcorrect.gonogo(vp,1);
+        
+        % reaction time
+        react.GOcorrect.gonogo(vp,1) = mean([summary1.reaction_time(find((summary1.response == 7) & (summary1.flag == GOflag))); summary2.reaction_time(find((summary2.response == 7) & (summary2.flag == GOflag))); summary3.reaction_time(find((summary3.response == 7) & (summary3.flag == GOflag)))]);
+        react.total.gonogo(vp,1)   = mean([summary1.reaction_time(find((summary1.response == 7) & (summary1.flag == GOflag))); summary2.reaction_time(find((summary2.response == GOflag) & (summary2.flag == GOflag))); summary3.reaction_time(find((summary3.response == 7) & (summary3.flag == GOflag)))]);
+        
+        % display
+        disp(['GO correct = ', num2str(ratio.GOcorrect.gonogo(vp,1))]);
+        disp(['NOGO correct = ', num2str(ratio.NOGOcorrect.gonogo(vp,1))]);
+        disp(['reaction time (correct) = ', num2str(react.GOcorrect.gonogo(vp,1))]);
+        disp(['reaction time (total) = ', num2str(react.total.gonogo(vp,1))]);
+    end
+    
+    disp('------------------------------------------------------------');
+    disp(['Grand average Go correct resopnse ratio: ', num2str(mean(ratio.GOcorrect.gonogo))]);
+    disp(['Grand average NoGo correct resopnse ratio: ', num2str(mean(ratio.NOGOcorrect.gonogo))]);
+    disp(['Grand average Go reaction time: ', num2str(mean(react.GOcorrect.gonogo))]);
+    
+    [h.ratio,p.ratio] =  ttest(ratio.GOcorrect.gonogo, ratio.NOGOcorrect.gonogo);
+    
+end
+
+cd(WorkingDir)
