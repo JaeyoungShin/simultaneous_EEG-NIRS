@@ -12,7 +12,7 @@ clear all; clc; close all;
 MyToolboxDir = fullfile('C:','Users','Shin','Documents','MATLAB','bbci_public-master');
 WorkingDir = fullfile('C:','Users','Shin','Documents','MATLAB','scientific_data');
 EegMyDataDir = fullfile('F:','scientific_data_publish','rawdata','EEG','without EOG');
-StatGNG = fullfile('F:','scientific_data_publish','statistic','Go-NoGo','summary');
+StatGNG = fullfile('F:','scientific_data_publish','behavior','Go-NoGo','summary');
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 cd(MyToolboxDir);
