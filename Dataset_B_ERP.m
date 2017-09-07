@@ -14,7 +14,7 @@ MyToolboxDir = fullfile('C:','Users','shin','Documents','MATLAB','bbci_public-ma
 WorkingDir = fullfile('C:','Users','shin','Documents','MATLAB','scientific_data');
 NirsMyDataDir = fullfile('F:','scientific_data_publish','rawdata','NIRS');
 EegMyDataDir = fullfile('F:','scientific_data_publish','rawdata','EEG');
-StatisticDir = fullfile('F:','scientific_data_publish','statistic');
+StatisticDir = fullfile('F:','scientific_data_publish','behavior');
 GoNogoDir = fullfile(StatisticDir,'Go-NoGo','summary');
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
