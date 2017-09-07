@@ -25,7 +25,7 @@ cd(WorkingDir);
 %% initial parameter
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 subdir_list = {'VP001-EEG','VP002-EEG','VP003-EEG','VP004-EEG','VP005-EEG','VP006-EEG','VP007-EEG','VP008-EEG','VP009-EEG','VP010-EEG','VP011-EEG','VP012-EEG','VP013-EEG','VP014-EEG','VP015-EEG','VP016-EEG','VP017-EEG','VP018-EEG','VP019-EEG','VP020-EEG','VP021-EEG','VP022-EEG','VP023-EEG','VP024-EEG','VP025-EEG'};
-stimDef.eeg= {32, 16; 'No-Go','Go'};
+stimDef.eeg= {32, 16; 'sym x','sym o'};
 
 ival_epo = [-0.1 1.0] * 1000;
 ival_base = [-0.1 0] * 1000;
