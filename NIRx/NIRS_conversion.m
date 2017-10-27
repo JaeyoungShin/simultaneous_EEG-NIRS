@@ -1,9 +1,10 @@
 % Convert NIRS data in NIRx format to MATLAB-compatible format
 %
 % Please see description PDF file for more details
-% Example rawdata is from VP026
+% example rawdata is from VP026
 % We strongly recommend you to use data in MATLAB-compatiable format uploaded separately
-% Please download BBCI toolbox
+
+clear all; clc; close all;
 
 %%%%%%%%%%%%%%%%%%%%%%%%%% please modify folder locations properly %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 BBCIToolboxDir = fullfile('C:','Users','Shin','Documents','MATLAB','bbci_public-master');
@@ -22,6 +23,10 @@ clab = {'AF7oxy','AFF5oxy','AFp7oxy','AF5hoxy','AFp3oxy','AFF3hoxy','AF1oxy','AF
         'PPO3oxy','AFF4hoxy','AF6hoxy','AFF6oxy','AFp8oxy','AF8oxy','FCC4oxy','C6hoxy','C4hoxy','CCP4oxy','CPP4oxy','P6hoxy','P4hoxy','PPO4oxy','PPOzoxy','PO1oxy','PO2oxy','POOzoxy', ...
         'AF7deoxy','AFF5deoxy','AFp7deoxy','AF5hdeoxy','AFp3deoxy','AFF3hdeoxy','AF1deoxy','AFFzdeoxy','AFpzdeoxy','AF2deoxy','AFp4deoxy','FCC3deoxy','C3hdeoxy','C5hdeoxy','CCP3deoxy','CPP3deoxy','P3hdeoxy','P5hdeoxy',...
         'PPO3deoxy','AFF4hdeoxy','AF6hdeoxy','AFF6deoxy','AFp8deoxy','AF8deoxy','FCC4deoxy','C6hdeoxy','C4hdeoxy','CCP4deoxy','CPP4deoxy','P6hdeoxy','P4hdeoxy','PPO4deoxy','PPOzdeoxy','PO1deoxy','PO2deoxy','POOzdeoxy'};
+
+stimDef.datasetA = {7, 8, 9; '0-back session','2-back session','3-back session'};
+stimDef.datasetB = {3; 'session'};
+stimDef.datasetC = {1, 2; 'WG','BL'};
 
 %% Convert data to MATLAB-compatible format
 
@@ -61,3 +66,8 @@ filename_datasetC{3}= fullfile('2016-07-11_009', 'NIRS-2016-07-11_009');
 
 % cnt_dsr = cnt7 + cnt8 + cnt9
 [cnt_dsr, mrk_dsr] = proc_appendCnt({cnt7, cnt8, cnt9}, {mrk7, mrk8, mrk9});
+
+% define classes in mrk files
+mrk_nback= mrk_defineClasses(mrk_nback, stimDef.datasetA);
+mrk_dsr  = mrk_defineClasses(mrk_dsr, stimDef.datasetB);
+mrk_wg   = mrk_defineClasses(mrk_wg, stimDef.datasetC);
