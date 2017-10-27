@@ -1,4 +1,4 @@
-% Conversion EEG data in BrainVison format to MATLAB-compatible format
+% Convert EEG data in BrainVison format to MATLAB-compatible format
 %
 % Please see description PDF file for more details
 % Example rawdata is from VP026
