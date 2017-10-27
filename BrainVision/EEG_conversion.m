@@ -1,6 +1,8 @@
 % Conversion EEG data in BrainVison format to MATLAB-compatible format
 %
 % Please see description PDF file for more details
+% Example rawdata is from VP026
+% We strongly recommend you to use data in MATLAB-compatiable format uploaded separately
 % Please download BBCI toolbox
 
 %%%%%%%%%%%%%%%%%%%%%%%%%% please modify folder locations properly %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
