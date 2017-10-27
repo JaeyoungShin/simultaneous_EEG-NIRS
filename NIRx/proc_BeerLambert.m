@@ -122,5 +122,4 @@ dat.clab = strrep(dat.clab, 'lowWL', 'oxy');
 dat.clab = strrep(dat.clab, 'highWL', 'deoxy');
 
 dat.signal = 'NIRS (oxy, deoxy)';
-
 dat.yUnit = 'mmol/L';
