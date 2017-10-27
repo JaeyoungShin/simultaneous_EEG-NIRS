@@ -13,8 +13,7 @@ cd(BBCIToolboxDir);
 startup_bbci_toolbox('DataDir',EegMyDataDir,'TmpDir','/tmp/','History',0);
 cd(WorkingDir);
 %% Convert data to MATLAB-compatible format
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-stimDef= {16, 32, 48;'Go','No-go','session'}; 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
 filename_datasetA = {'nback1','nback2','nback3'};
 filename_datasetB = {'word1','word2','word3'};
 filename_datasetC = {'gonogo1','gonogo2','gonogo3'};
