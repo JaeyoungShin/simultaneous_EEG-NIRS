@@ -3,8 +3,7 @@
 % Please see description PDF file for more details
 % Example rawdata is from VP026
 % We strongly recommend you to use data in MATLAB-compatiable format uploaded separately
-
-clear all; clc; close all;
+% Please download BBCI toolbox
 
 %%%%%%%%%%%%%%%%%%%%%%%%%% please modify folder locations properly %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 BBCIToolboxDir = fullfile('C:','Users','Shin','Documents','MATLAB','bbci_public-master');
