@@ -1,6 +1,5 @@
 % Conversion EEG data in BrainVison format to MATLAB-compatible format
 % Please see description PDF file for more details
-clear all; clc; close all;
 
 %%%%%%%%%%%%%%%%%%%%%%%%%% please modify folder locations properly %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 BBCIToolboxDir = fullfile('C:','Users','Shin','Documents','MATLAB','bbci_public-master');
