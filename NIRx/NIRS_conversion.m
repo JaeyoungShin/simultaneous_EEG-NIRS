@@ -1,7 +1,7 @@
 % Convert NIRS data in NIRx format to MATLAB-compatible format
 %
 % Please see description PDF file for more details
-% example rawdata is from VP026
+% Example rawdata is from VP026
 % We strongly recommend you to use data in MATLAB-compatiable format uploaded separately
 
 clear all; clc; close all;
