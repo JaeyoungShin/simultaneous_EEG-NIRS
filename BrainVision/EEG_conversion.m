@@ -1,4 +1,5 @@
 % Conversion EEG data in BrainVison format to MATLAB-compatible format
+%
 % Please see description PDF file for more details
 % Please download BBCI toolbox
 
