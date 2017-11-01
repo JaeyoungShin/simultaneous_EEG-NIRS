@@ -40,19 +40,19 @@ for vp = 1 : length(subdir_list.nirs)
     disp([subdir_list.nirs{vp}, ' was started']);
     loadDir = fullfile(NirsMyDataDir,subdir_list.nirs{vp});
     cd(loadDir);
-    load cnt_vf; load mrk_vf; load mnt_vf;
+    load cnt_wg; load mrk_wg; load mnt_wg;
     cd(WorkingDir);
     
     %% low-pass filter   
-    [z,p,k] = butter(ord, band_freq/cnt_vf.deoxy.fs*2, 'low');
+    [z,p,k] = butter(ord, band_freq/cnt_wg.deoxy.fs*2, 'low');
     [SOS,G] = zp2sos(z,p,k);
     
-    cnt_vf.deoxy = proc_filtfilt(cnt_vf.deoxy, SOS, G);
-    cnt_vf.oxy   = proc_filtfilt(cnt_vf.oxy,   SOS, G);
+    cnt_wg.deoxy = proc_filtfilt(cnt_wg.deoxy, SOS, G);
+    cnt_wg.oxy   = proc_filtfilt(cnt_wg.oxy,   SOS, G);
        
     %% Segmentation
-    epo.deoxy = proc_segmentation(cnt_vf.deoxy, mrk_vf, ival_epo);
-    epo.oxy   = proc_segmentation(cnt_vf.oxy, mrk_vf, ival_epo);
+    epo.deoxy = proc_segmentation(cnt_wg.deoxy, mrk_wg, ival_epo);
+    epo.oxy   = proc_segmentation(cnt_wg.oxy, mrk_wg, ival_epo);
 
     %% baseline correction
     epo.deoxy = proc_baseline(epo.deoxy, ival_base);
@@ -76,7 +76,7 @@ for vp = 1 : length(subdir_list.nirs)
         slope.oxy{stepIdx}   = proc_slopeAcrossTime(epo.oxy,   ival(stepIdx,:));
     end
     
-    clear cnt_vf mrk_vf mnt_vf
+    clear cnt_wg mrk_wg mnt_wg
         
     %% EEG PART START
     disp([subdir_list.eeg{vp}, ' was started']);
@@ -84,24 +84,24 @@ for vp = 1 : length(subdir_list.nirs)
     loadDir = fullfile(EegMyDataDir,subdir_list.eeg{vp});
     cd(loadDir);
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    load cnt_vf; load mrk_vf; load mnt_vf;
+    load cnt_wg; load mrk_wg; load mnt_wg;
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     cd(WorkingDir);
       
     %% Select EEG channels (exclude EOG channels) for classification
     % result: cnt and mnt with EEG channels only
-    cnt_vf = proc_selectChannels(cnt_vf, 'not', '*EOG'); % remove EOG channels (VEOG, HEOG)
-    mnt_vf = mnt_setElectrodePositions(cnt_vf.clab);
+    cnt_wg = proc_selectChannels(cnt_wg, 'not', '*EOG'); % remove EOG channels (VEOG, HEOG)
+    mnt_wg = mnt_setElectrodePositions(cnt_wg.clab);
        
     %% Segmentation
     ival_epo  = [-10 25]*1000; % epoch range (unit: msec)
     ival_base = [-5 -2]*1000; % baseline correction range (unit: msec)
     
-    epo.eeg = proc_segmentation(cnt_vf, mrk_vf, ival_epo);
+    epo.eeg = proc_segmentation(cnt_wg, mrk_wg, ival_epo);
     epo.eeg = proc_baseline(epo.eeg,ival_base, 'trialwise', 1);
         
     %% band selection for CSP
-    band_csp{vp,1} = select_bandnarrow(cnt_vf, mrk_vf, [-2 10]*1000); % band selection using 1~5 sec epoch for {'MA','WC'}
+    band_csp{vp,1} = select_bandnarrow(cnt_wg, mrk_wg, [-2 10]*1000); % band selection using 1~5 sec epoch for {'MA','WG'}
     ord = 3;
     Wp = band_csp{vp,1}/epo.eeg.fs*2;
     
