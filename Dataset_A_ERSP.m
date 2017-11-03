@@ -16,12 +16,11 @@ clear all; clc; close all;
 %%%%%%%%%%%%%%%%%%%%%%%% modify directory paths properly %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 MyToolboxDir = fullfile('C:','Users','shin','Documents','MATLAB','bbci_toolbox_latest_ver');
 WorkingDir = fullfile('C:','Users','shin','Documents','MATLAB','scientific_data');
-NirsMyDataDir = fullfile('F:','scientific_data_publish','rawdata','NIRS');
 EegMyDataDir = fullfile('F:','scientific_data_publish','rawdata','EEG');
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 cd(MyToolboxDir);
-startup_bbci_toolbox('DataDir',NirsMyDataDir,'TmpDir','/tmp/','History',0);
+startup_bbci_toolbox('DataDir',EegMyDataDir,'TmpDir','/tmp/','History',0);
 cd(WorkingDir);
 
 addpath(genpath(pwd));
