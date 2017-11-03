@@ -9,6 +9,7 @@ Shin, Jaeyoung, et al. "Simultaneous acquisition of EEG and NIRS during cognitiv
 Data processing was performed using MATLAB 2013b.
 Please use MATLAB 2013b or older version. 
 
+Please download BBCI toolbox (https://github.com/bbci/bbci_public)
 The MATLAB scripts were written based on the BBCI toolbox (ver. 03 Nov. 2017)
 You may run into some errors if you use later version of BBCI toolbox or MATLAB.
 We do not guarantee that MATLAB scripts works properly in later version of MATLAB and BBCI toolbox.
