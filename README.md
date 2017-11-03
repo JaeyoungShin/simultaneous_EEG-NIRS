@@ -8,12 +8,14 @@ Shin, Jaeyoung, et al. "Simultaneous acquisition of EEG and NIRS during cognitiv
 # Caution
 Data processing was performed using MATLAB 2013b.
 Please use MATLAB 2013b or older version. 
-We also recommend you to download an old version of BBCI toolbox in the following link:
 
-https://github.com/JaeyoungShin/hybrid-BCI/blob/master/bbci_public-master_TNSRE.zip
-
-This zip file includes the updated version of 'proc_BeerLambert'.
+The MATLAB scripts were written based on the BBCI toolbox (ver. 03 Nov. 2017)
 You may run into some errors if you use later version of BBCI toolbox or MATLAB.
+We cannot guarantee if MATLAB scripts works properly.
+
+- For NIRS data conversion, please download 'proc_BeerLambert.m' here and overwrite it to the corresponding subfolder in BBCI toolbox.
+- For the use of customized values of 'CLim', please download 'visutil_getCommonRange.m' here and overwrite it to the corresponding subfolder in BBCI toolbox.
+- Please download 'plot_scalpEvolutionPlusChannel.m' here and overwrite to the corresponding subfolder in BBCI toolbox.
 
 # Basic Data Structures
 This document is from https://github.com/bbci/bbci_public/blob/master/doc/ToolboxData.markdown and partly modified.
