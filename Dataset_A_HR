@@ -5,11 +5,12 @@
 % (or a modified version, maintaining a significant portion of the original code) would cite the following article:
 % Shin et al. "Simultaneous acquisition of EEG and NIRS during cognitive tasks for an open access dataset",
 % Scientific data (2017), under review.
+% NOTE: Figure may be different from that shown in Shin et al. (2017) because EOG-rejection is not performed.
 
 clear all; clc; close all;
 
 %%%%%%%%%%%%%%%%%%%%%%%% modify directory paths properly %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-MyToolboxDir = fullfile('C:','Users','shin','Documents','MATLAB','bbci_public-master');
+MyToolboxDir = fullfile('C:','Users','shin','Documents','MATLAB','bbci_toolbox_latest_ver');
 WorkingDir = fullfile('C:','Users','shin','Documents','MATLAB','scientific_data');
 NirsMyDataDir = fullfile('F:','scientific_data_publish','rawdata','NIRS');
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -47,6 +48,12 @@ for vp = 1 : length(subdir_list)
     epo.deoxy = proc_segmentation(cnt_nback.deoxy, mrk_nback, ival_epo);
     epo.oxy   = proc_segmentation(cnt_nback.oxy,   mrk_nback, ival_epo);
     
+    % Add unit of x- and y-axis
+    epo.deoxy.xUnit = 's';
+    epo.deoxy.yUnit = 'mmol/L';
+    epo.oxy.xUnit = 's';
+    epo.oxy.yUnit = 'mmol/L';
+
     if vp == 1
         epo_all.deoxy = epo.deoxy;
         epo_all.oxy   = epo.oxy;
@@ -64,15 +71,13 @@ epo_all.oxy   = proc_baseline(epo_all.oxy, ival_base);
 epo_all.deoxy.t = epo_all.deoxy.t(:,:,1);
 epo_all.oxy.t = epo_all.oxy.t(:,:,1);
 
-%% Add unit of x- and y-axis
-epo_all.deoxy.xUnit = 's';
-epo_all.deoxy.yUnit = 'mmol/L';
-epo_all.oxy.xUnit = 's';
-epo_all.oxy.yUnit = 'mmol/L';
+%% Trial-Average
+epo_all.deoxy = proc_average(epo_all.deoxy, 'Stats', 1);
+epo_all.oxy   = proc_average(epo_all.oxy, 'Stats', 1);
 
 %% Plot figures
 fig_set(3, 'Toolsoff', 0, 'Resize', [1 2]);
-plot_scalpEvolutionPlusChannel(epo_all.deoxy, mnt_nback, {'AF7','C3h'}, ival_scalp, defopt_scalp_erp, 'Extrapolation', 0, 'Contour', 0, 'ColorOrder', [0 216 255; 0 84 255; 95 0 255]/255, 'printival', 1, 'Colormap', cmap_asymmetry, 'yLim', ylim, 'PlotStd', 1, 'CLim', [-1 0.75]*0.001);
+plot_scalpEvolutionPlusChannel(epo_all.deoxy, mnt_nback, {'AF7','C3h'}, ival_scalp, defopt_scalp_erp, 'GlobalCLim', 0, 'Extrapolation', 0, 'Contour', 0, 'ColorOrder', [0 216 255; 0 84 255; 95 0 255]/255, 'printival', 1, 'Colormap', cmap_asymmetry, 'yLim', ylim, 'CLim', [-1 0.75]*0.001, 'PlotStat', 'sem');
 
 fig_set(4, 'Toolsoff', 0, 'Resize', [1 2]);
-plot_scalpEvolutionPlusChannel(epo_all.oxy, mnt_nback, {'AF7','C3h'}, ival_scalp, defopt_scalp_erp, 'Extrapolation', 0, 'Contour', 0, 'ColorOrder', [255 167 167; 255 148 54; 255 0 0]/255,'printival', 1, 'Colormap', cmap_asymmetry, 'yLim', ylim, 'PlotStd', 1, 'CLim', [-2 4/3]*0.001);
+plot_scalpEvolutionPlusChannel(epo_all.oxy, mnt_nback, {'AF7','C3h'}, ival_scalp, defopt_scalp_erp, 'GlobalCLim', 0, 'Extrapolation', 0, 'Contour', 0, 'ColorOrder', [255 167 167; 255 148 54; 255 0 0]/255,'printival', 1, 'Colormap', cmap_asymmetry, 'yLim', ylim, 'CLim', [-2 4/3]*0.001, 'PlotStat', 'sem');
