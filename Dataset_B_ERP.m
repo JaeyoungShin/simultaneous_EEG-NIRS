@@ -50,7 +50,6 @@ for vp = 1 : length(subdir_list)
     correctIdx = find(summary == 1);
     incorrectIdx = find(summary ~= 1);
      
-     
     %% Load raw EEG data
     loadDir = fullfile(EegMyDataDir,subdir_list{vp});
     cd(loadDir);
