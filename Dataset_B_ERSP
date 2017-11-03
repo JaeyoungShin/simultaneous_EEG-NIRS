@@ -6,19 +6,17 @@
 % (or a modified version, maintaining a significant portion of the original code) would cite the following article:
 % Shin et al. "Simultaneous acquisition of EEG and NIRS during cognitive tasks for an open access dataset",
 % Scientific data (2017), under review.
-%
-% marker information
-% [16, 48, 64, 80, 96, 112, 128, 144] = [0-back target, 2-back target, 2-back non-target, 3-back target, 3-back non-target, 0-back session start, 2-back session start, 3-back session start
+% NOTE: Figure may be different from that shown in Shin et al. (2017) because EOG-rejection is not performed.
 
 clear all; clc; close all;
 
 %%%%%%%%%%%%%%%%%%%%%%%% modify directory paths properly %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-MyToolboxDir = fullfile('C:','Users','shin','Documents','MATLAB','bbci_public-master');
+MyToolboxDir = fullfile('C:','Users','shin','Documents','MATLAB','bbci_toolbox_latest_ver');
 WorkingDir = fullfile('C:','Users','shin','Documents','MATLAB','scientific_data');
 NirsMyDataDir = fullfile('F:','scientific_data_publish','rawdata','NIRS');
 
-EegMyDataDir = fullfile('F:','scientific_data_publish','rawdata','EEG','without EOG');
-
+% EegMyDataDir = fullfile('F:','scientific_data_publish','rawdata','EEG','without EOG');
+EegMyDataDir = fullfile('F:','scientific_data_publish','rawdata','EEG');
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 cd(MyToolboxDir);
@@ -47,19 +45,19 @@ for vp = 1 : length(subdir_list)
     % load EEG data
     loadDir = fullfile(EegMyDataDir,subdir_list{vp});
     cd(loadDir);
-    load cnt_gonogo; load mrk_gonogo; load mnt_gonogo;
+    load cnt_dsr; load mrk_dsr; load mnt_dsr;
     cd(WorkingDir);
     
     % marker selection: session (ssn)
-    mrk_ssn = mrk_selectClasses(mrk_gonogo, 'session');
+    mrk_ssn = mrk_selectClasses(mrk_dsr, 'session');
        
     % segmentation: session (ssn)
-    ssn = proc_segmentation(cnt_gonogo, mrk_ssn, ival_epo); % 0-back
+    ssn = proc_segmentation(cnt_dsr, mrk_ssn, ival_epo); % 0-back
     
     % manipulation for EEGLAB compatible format
     ssn.x1 = permute(ssn.x, [2, 1, 3]); % nch x nsamples x ntrials
     
-    for ch = 1 : length(mnt_gonogo.clab)-2 % exclude two EOG channels
+    for ch = 1 : length(mnt_dsr.clab)-2 % exclude two EOG channels
         chdata = ssn.x1(ch,:,:);
         
         [ersp(:,:,ch,vp),itc,powbase,times,freqs,erspboot,itcboot] =...
@@ -71,15 +69,15 @@ end
 
 %% average ERSP over multiple participants
 % ave_0back: [time x freq x ch x participant]
-ave_gonogo = mean(ersp,4);
+ave_dsr = mean(ersp,4);
 
 %% plot ERSP
-clab = cnt_gonogo.clab;
+clab = cnt_dsr.clab;
  
 figure(1)
 for ch = 1 : length(clab)-2
     subplot(7,9,subplotIdx(ch));
-    imagesc(times/1000,freqs,ave_gonogo(:,:,ch), clim); title(clab{ch});
+    imagesc(times/1000,freqs,ave_dsr(:,:,ch), clim); title(clab{ch});
     set(gca, 'YDir','normal'); ylim([1 40]); colormap(cmap_posneg(101));
 end
 colorbar('OuterPosition', [0.645 0.828 0.016 0.09]);
