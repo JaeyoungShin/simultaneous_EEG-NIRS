@@ -6,23 +6,19 @@
 % (or a modified version, maintaining a significant portion of the original code) would cite the following article:
 % Shin et al. "Simultaneous acquisition of EEG and NIRS during cognitive tasks for an open access dataset",
 % Scientific data (2017), under review.
-%
-% marker information
-% [16, 48, 64, 80, 96, 112, 128, 144] = [0-back target, 2-back target, 2-back non-target, 3-back target, 3-back non-target, 0-back session start, 2-back session start, 3-back session start
+% NOTE: Figure may be different from that shown in Shin et al. (2017) because EOG-rejection is not performed.
 
 clear all; clc; close all;
 
 %%%%%%%%%%%%%%%%%%%%%%%% modify directory paths properly %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 MyToolboxDir = fullfile('C:','Users','shin','Documents','MATLAB','bbci_public-master');
 WorkingDir = fullfile('C:','Users','shin','Documents','MATLAB','scientific_data');
-NirsMyDataDir = fullfile('F:','scientific_data_publish','rawdata','NIRS');
-
-EegMyDataDir = fullfile('F:','scientific_data_publish','rawdata','EEG','without EOG');
-
+% EegMyDataDir = fullfile('F:','scientific_data_publish','rawdata','EEG','without EOG');
+EegMyDataDir = fullfile('F:','scientific_data_publish','rawdata','EEG');
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 cd(MyToolboxDir);
-startup_bbci_toolbox('DataDir',NirsMyDataDir,'TmpDir','/tmp/','History',0);
+startup_bbci_toolbox('DataDir',EegMyDataDir,'TmpDir','/tmp/','History',0);
 cd(WorkingDir);
 
 addpath(genpath(pwd));
@@ -47,24 +43,24 @@ for vp = 1 : length(subdir_list)
     % load EEG data
     loadDir = fullfile(EegMyDataDir,subdir_list{vp});
     cd(loadDir);
-    load cnt_vf; load mrk_vf; load mnt_vf;
+    load cnt_wg; load mrk_wg; load mnt_wg;
     cd(WorkingDir);
     
     % marker selection
-    mrk_BL = mrk_selectClasses(mrk_vf, 'BL');
-    mrk_VF = mrk_selectClasses(mrk_vf, 'VF');
+    mrk_BL = mrk_selectClasses(mrk_wg, 'BL');
+    mrk_WG = mrk_selectClasses(mrk_wg, 'WG');
     
     % segmentation   
-    ssn_BL = proc_segmentation(cnt_vf, mrk_BL, ival_epo); % 0-back
-    ssn_VF = proc_segmentation(cnt_vf, mrk_VF, ival_epo); % 2-back
+    ssn_BL = proc_segmentation(cnt_wg, mrk_BL, ival_epo); % 0-back
+    ssn_WG = proc_segmentation(cnt_wg, mrk_WG, ival_epo); % 2-back
     
     % manipulation for EEGLAB compatible format
     ssn_BL.x1 = permute(ssn_BL.x, [2, 1, 3]); % nch x nsamples x ntrials
-    ssn_VF.x1 = permute(ssn_VF.x, [2, 1, 3]); % nch x nsamples x ntrials
+    ssn_WG.x1 = permute(ssn_WG.x, [2, 1, 3]); % nch x nsamples x ntrials
     
-    for ch = 1 : length(mnt_vf.clab)-2 % exclude two EOG channels
+    for ch = 1 : length(mnt_wg.clab)-2 % exclude two EOG channels
         chdata_BL = ssn_BL.x1(ch,:,:);
-        chdata_VF = ssn_VF.x1(ch,:,:);
+        chdata_WG = ssn_WG.x1(ch,:,:);
         
         % BL
         [ersp_BL(:,:,ch,vp),itc,powbase,times,freqs,erspboot,itcboot] =...
@@ -73,8 +69,8 @@ for vp = 1 : length(subdir_list)
             'baseline', ival_base,'trialbase','full','rmerp','on');
         
         % TASK
-        [ersp_VF(:,:,ch,vp),itc,powbase,times,freqs,erspboot,itcboot] =...
-            newtimef(chdata_VF, size(ssn_VF.x1,2), ival_epo, ssn_VF.fs, cycles,...
+        [ersp_WG(:,:,ch,vp),itc,powbase,times,freqs,erspboot,itcboot] =...
+            newtimef(chdata_WG, size(ssn_WG.x1,2), ival_epo, ssn_WG.fs, cycles,...
             'type','phasecoher','freqs',fc,'plotitc','off','plotersp','off',...
             'baseline',ival_base,'trialbase','full','rmerp','on');
     end   
@@ -83,10 +79,10 @@ end
 %% average ERSP over multiple participants
 % ave_BL: [time x freq x ch x participant]
 ave_BL = mean(ersp_BL,4);
-ave_VF = mean(ersp_VF,4);
+ave_WG = mean(ersp_WG,4);
 
 %% plot ERSP
-clab = cnt_vf.clab;
+clab = cnt_wg.clab;
  
 figure(1)
 for ch = 1 : length(clab)-2
@@ -99,7 +95,7 @@ colorbar('OuterPosition', [0.645 0.828 0.016 0.09]);
 figure(2)
 for ch = 1 : length(clab)-2
     subplot(7,9,subplotIdx(ch));
-    imagesc(times/1000,freqs,ave_VF(:,:,ch), clim); title(clab{ch});
+    imagesc(times/1000,freqs,ave_WG(:,:,ch), clim); title(clab{ch});
     set(gca, 'YDir','normal'); ylim([1 40]); colormap(cmap_posneg(101));
 end
 colorbar('OuterPosition', [0.645 0.828 0.016 0.09]);
