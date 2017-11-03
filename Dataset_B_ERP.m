@@ -6,16 +6,20 @@
 % (or a modified version, maintaining a significant portion of the original code) would cite the following article:
 % Shin et al. "Simultaneous acquisition of EEG and NIRS during cognitive tasks for an open access dataset",
 % Scientific data (2017), under review.
+% NOTE: Figure may be different from that shown in Shin et al. (2017) because EOG-rejection is not performed.
 
 clear all; clc; close all;
 
 %%%%%%%%%%%%%%%%%%%%%%%% modify directory paths properly %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-MyToolboxDir = fullfile('C:','Users','shin','Documents','MATLAB','bbci_public-master');
+MyToolboxDir = fullfile('C:','Users','shin','Documents','MATLAB','bbci_toolbox_latest_ver');
 WorkingDir = fullfile('C:','Users','shin','Documents','MATLAB','scientific_data');
 NirsMyDataDir = fullfile('F:','scientific_data_publish','rawdata','NIRS');
+
+% EegMyDataDir = fullfile('F:','scientific_data_publish','rawdata','EEG','without EOG');
 EegMyDataDir = fullfile('F:','scientific_data_publish','rawdata','EEG');
+
 StatisticDir = fullfile('F:','scientific_data_publish','behavior');
-GoNogoDir = fullfile(StatisticDir,'Go-NoGo','summary');
+DsrDir = fullfile(StatisticDir,'dsr','summary');
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 cd(MyToolboxDir);
@@ -24,18 +28,19 @@ cd(WorkingDir);
 
 %% initial parameter
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-subdir_list = {'VP001-EEG','VP002-EEG','VP003-EEG','VP004-EEG','VP005-EEG','VP006-EEG','VP007-EEG','VP008-EEG','VP009-EEG','VP010-EEG','VP011-EEG','VP012-EEG','VP013-EEG','VP014-EEG','VP015-EEG','VP016-EEG','VP017-EEG','VP018-EEG','VP019-EEG','VP020-EEG','VP021-EEG','VP022-EEG','VP023-EEG','VP024-EEG','VP025-EEG'};
+subdir_list = {'VP001-EEG','VP002-EEG','VP003-EEG','VP004-EEG','VP005-EEG','VP006-EEG','VP007-EEG','VP008-EEG','VP009-EEG','VP010-EEG','VP011-EEG','VP012-EEG','VP013-EEG','VP014-EEG','VP015-EEG','VP016-EEG','VP017-EEG','VP018-EEG','VP019-EEG','VP020-EEG','VP021-EEG','VP022-EEG','VP023-EEG','VP024-EEG','VP025-EEG','VP026-EEG'};
 stimDef.eeg= {32, 16; 'sym x','sym o'};
 
-ival_epo = [-0.1 1.0] * 1000;
+ival_epo = [-0.1 1] * 1000;
 ival_base = [-0.1 0] * 1000;
+ival_scalps = [0 0.2; 0.2 0.4; 0.4 0.6; 0.6 0.8; 0.8 1]*1000;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 for vp = 1 : length(subdir_list)
      disp([subdir_list{vp}, ' was started']);
      
      % correct epoch selection
-    vpDir = fullfile(GoNogoDir, subdir_list{vp});
+    vpDir = fullfile(DsrDir, subdir_list{vp});
     cd(vpDir);
     load summary1; load summary2; load summary3;   
     
@@ -50,30 +55,32 @@ for vp = 1 : length(subdir_list)
     loadDir = fullfile(EegMyDataDir,subdir_list{vp});
     cd(loadDir);
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    load cnt_gonogo; load mrk_gonogo; load mnt_gonogo;
+    load cnt_dsr; load mrk_dsr; load mnt_dsr;
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     cd(WorkingDir);
-   
-    %% BPF
-    [b, a] = butter(3, [1 30]/cnt_gonogo.fs*2);
-    cnt_gonogo = proc_filtfilt(cnt_gonogo, b, a);
-    
+      
     %% Marker selection
-    mrk_gonogo= mrk_defineClasses(mrk_gonogo, stimDef.eeg);
+    mrk_dsr= mrk_defineClasses(mrk_dsr, stimDef.eeg);
     
     %% Select EEG channels only (apart from EOG channels) for classification
     % result: cnt and mnt with EEG channels only
-    cnt_gonogo = proc_selectChannels(cnt_gonogo, 'not','*EOG'); % remove EOG channels (VEOG, HEOG)   
-    mnt_gonogo = mnt_setElectrodePositions(cnt_gonogo.clab);
+    cnt_dsr = proc_selectChannels(cnt_dsr, 'not','*EOG'); % remove EOG channels (VEOG, HEOG)   
+    mnt_dsr = mnt_setElectrodePositions(cnt_dsr.clab);
     
+    %% 50 Hz mains filtering
+    [b, a] = butter(3, [1 40]/cnt_dsr.fs*2, 'bandpass'); % 1-40 Hz band-pass filtering
+    cnt_dsr = proc_filtfilt(cnt_dsr, b, a);
+        
     %% Artifact rejection based on variance criterion
-    mrk = reject_varEventsAndChannels(cnt_gonogo, mrk_gonogo, ival_epo, 'verbose', 1);
+    mrk = reject_varEventsAndChannels(cnt_dsr, mrk_dsr, ival_epo, 'verbose', 1);
     
     %% Segmentation
-    epo = proc_segmentation(cnt_gonogo, mrk_gonogo, ival_epo);   
+    epo = proc_segmentation(cnt_dsr, mrk_dsr, ival_epo);   
    
     %% Select epoch with correct answer
     epo = proc_selectEpochs(epo, 'not', incorrectIdx);
+    epo.xUnit = 'ms'; 
+    epo.yUnit = '\muV';
     disp([num2str(length(incorrectIdx)), ' epoch(s) was/were rejected due to incorrect answer']);
 
     if vp == 1
@@ -98,12 +105,12 @@ epo_all = proc_appendEpochs(epo_all, epo_diff);
 % Dimentionality correction
 epo_all.t = epo_all.t(:,:,1);
 
+%% Trial-Average
+epo_all = proc_average(epo_all, 'Stats',1);
+
 %% Display
-epo_all.xUnit = 'ms';
-epo_all.yUnit = '\muV';
-
 clab = {'Cz','Pz'};
-ival_scalps = [0 0.2; 0.2 0.4; 0.4 0.6; 0.6 0.8; 0.8 1]*1000;
-
-fig_set(7, 'Toolsoff', 0, 'Resize', [1 2]);
-H = plot_scalpEvolutionPlusChannel(epo_all, mnt_gonogo, clab, ival_scalps, defopt_scalp_erp, 'Extrapolation', 0, 'Contour', 0, 'printival', 1, 'Colormap', cmap_posneg(101), 'PlotStd', 1, 'yLim', [-1 1]*8, 'CLim', [-1 1]*5);
+fig_set(3, 'Toolsoff', 0, 'Resize', [1 2]);
+H = plot_scalpEvolutionPlusChannel(epo_all, mnt_dsr, clab, ival_scalps, defopt_scalp_erp, ...
+    'Extrapolation', 0, 'Contour', 0, 'printival', 1, 'Colormap', cmap_posneg(101),'PlotStat', 'sem', ...
+    'yLim', [-1 1]*8, 'CLim', [-1 1]*8);
