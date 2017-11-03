@@ -5,14 +5,16 @@
 % (or a modified version, maintaining a significant portion of the original code) would cite the following article:
 % Shin et al. "Simultaneous acquisition of EEG and NIRS during cognitive tasks for an open access dataset",
 % Scientific data (2017), under review.
+% NOTE: Figure may be different from that shown in Shin et al. (2017) because EOG-rejection is not performed.
 
 clear all; clc; close all;
 
 %%%%%%%%%%%%%%%%%%%%%%%% modify directory paths properly %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-MyToolboxDir = fullfile('C:','Users','Shin','Documents','MATLAB','bbci_public-master');
+MyToolboxDir = fullfile('C:','Users','shin','Documents','MATLAB','bbci_toolbox_latest_ver');
 WorkingDir = fullfile('C:','Users','Shin','Documents','MATLAB','scientific_data');
-EegMyDataDir = fullfile('F:','scientific_data_publish','rawdata','EEG','without EOG');
-StatGNG = fullfile('F:','scientific_data_publish','behavior','Go-NoGo','summary');
+% EegMyDataDir = fullfile('F:','scientific_data_publish','rawdata','EEG','without EOG');
+EegMyDataDir = fullfile('F:','scientific_data_publish','rawdata','EEG');
+StatGNG = fullfile('F:','scientific_data_publish','behavior','dsr','summary');
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 cd(MyToolboxDir);
@@ -22,7 +24,7 @@ cd(WorkingDir);
 %% initial parameter
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 subdir_list = {'VP001-EEG','VP002-EEG','VP003-EEG','VP004-EEG','VP005-EEG','VP006-EEG','VP007-EEG','VP008-EEG','VP009-EEG','VP010-EEG','VP011-EEG','VP012-EEG','VP013-EEG','VP014-EEG','VP015-EEG','VP016-EEG','VP017-EEG','VP018-EEG','VP019-EEG','VP020-EEG','VP021-EEG','VP022-EEG','VP023-EEG','VP024-EEG','VP025-EEG','VP026-EEG'};
-stimDef.eeg= {16, 32;'target','nontarget'};
+stimDef.eeg= {16, 32;'sym o','sym x'};
 
 disp_ival = [-0.2 1] * 1000;
 base_ival = [-0.1 0] * 1000;
@@ -45,21 +47,21 @@ for vp = 1 : length(subdir_list)
     
     cd(WorkingDir);   
      
-    % Load EOG-free data
+    % Load raw EEG data
     loadDir = fullfile(EegMyDataDir,subdir_list{vp});
     cd(loadDir);
-    load cnt_gonogo; load mrk_gonogo; load mnt_gonogo;
+    load cnt_dsr; load mrk_dsr; load mnt_dsr;
     cd(WorkingDir);
 
     % Marker definition
-    mrk_gonogo= mrk_defineClasses(mrk_gonogo, stimDef.eeg);
+    mrk_dsr= mrk_defineClasses(mrk_dsr, stimDef.eeg);
     
     % Select EEG channels only (apart from EOG channels) for classification
-    cnt_gonogo = proc_selectChannels(cnt_gonogo, 'not','*EOG'); % remove EOG channels (VEOG, HEOG)
-    mnt_gonogo = mnt_setElectrodePositions(cnt_gonogo.clab);
+    cnt_dsr = proc_selectChannels(cnt_dsr, 'not','*EOG'); % remove EOG channels (VEOG, HEOG)
+    mnt_dsr = mnt_setElectrodePositions(cnt_dsr.clab);
                         
     % Segmentation
-    epo = proc_segmentation(cnt_gonogo, mrk_gonogo, disp_ival);
+    epo = proc_segmentation(cnt_dsr, mrk_dsr, disp_ival);
     
     % Select epoch with correct answer
     epo = proc_selectEpochs(epo, 'not', incorrectIdx);
