@@ -11,7 +11,7 @@ Please use MATLAB 2013b or older version.
 
 The MATLAB scripts were written based on the BBCI toolbox (ver. 03 Nov. 2017)
 You may run into some errors if you use later version of BBCI toolbox or MATLAB.
-We cannot guarantee if MATLAB scripts works properly.
+We do not guarantee that MATLAB scripts works properly in later version of MATLAB and BBCI toolbox.
 
 - For NIRS data conversion, please download 'proc_BeerLambert.m' here and overwrite it to the corresponding subfolder in BBCI toolbox.
 - For the use of customized values of 'CLim', please download 'visutil_getCommonRange.m' here and overwrite it to the corresponding subfolder in BBCI toolbox.
