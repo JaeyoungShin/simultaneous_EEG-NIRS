@@ -5,11 +5,13 @@
 % (or a modified version, maintaining a significant portion of the original code) would cite the following article:
 % Shin et al. "Simultaneous acquisition of EEG and NIRS during cognitive tasks for an open access dataset",
 % Scientific data (2017), under review.
+% NOTE: Figure may be different from that shown in Shin et al. (2017) because EOG-rejection is not performed.
 
 clear all; clc; close all;
 
 %%%%%%%%%%%%%%%%%%%%%%%% modify directory paths properly %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-MyToolboxDir = fullfile('C:','Users','shin','Documents','MATLAB','bbci_public-master');
+% MyToolboxDir = fullfile('C:','Users','shin','Documents','MATLAB','bbci_public-master');
+MyToolboxDir = fullfile('C:','Users','shin','Documents','MATLAB','bbci_toolbox_latest_ver');
 WorkingDir = fullfile('C:','Users','shin','Documents','MATLAB','scientific_data');
 NirsMyDataDir = fullfile('F:','scientific_data_publish','rawdata','NIRS');
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -34,20 +36,26 @@ for vp = 1 : length(subdir_list)
     disp([subdir_list{vp}, ' was started']);
     loadDir = fullfile(NirsMyDataDir,subdir_list{vp});
     cd(loadDir);
-    load cnt_vf; load mrk_vf; load mnt_vf;
+    load cnt_wg; load mrk_wg; load mnt_wg;
     cd(WorkingDir);
     
-    mrk_vf.className = {'WG','BL'};
+    mrk_wg.className = {'WG','BL'};
       
     % low-pass filter
-    [b,a] = butter(3, 0.2/cnt_vf.deoxy.fs*2, 'low');
-    cnt_vf.deoxy = proc_filtfilt(cnt_vf.deoxy, b, a);
-    cnt_vf.oxy   = proc_filtfilt(cnt_vf.oxy, b, a);
+    [b,a] = butter(3, 0.2/cnt_wg.deoxy.fs*2, 'low');
+    cnt_wg.deoxy = proc_filtfilt(cnt_wg.deoxy, b, a);
+    cnt_wg.oxy   = proc_filtfilt(cnt_wg.oxy, b, a);
     
     % segmentation
-    epo.deoxy = proc_segmentation(cnt_vf.deoxy, mrk_vf, ival_epo);
-    epo.oxy   = proc_segmentation(cnt_vf.oxy, mrk_vf, ival_epo);
-        
+    epo.deoxy = proc_segmentation(cnt_wg.deoxy, mrk_wg, ival_epo);
+    epo.oxy   = proc_segmentation(cnt_wg.oxy, mrk_wg, ival_epo);
+   
+    % Add unit of x- and y-axis
+    epo.deoxy.xUnit = 's';
+    epo.deoxy.yUnit = 'mmol/L';
+    epo.oxy.xUnit = 's';
+    epo.oxy.yUnit = 'mmol/L';
+    
     if vp == 1
         epo_all.deoxy = epo.deoxy;
         epo_all.oxy   = epo.oxy;
@@ -66,24 +74,16 @@ epo_all.oxy   = proc_baseline(epo_all.oxy, ival_base);
 epo_all.deoxy.t = epo_all.deoxy.t(:,:,1);
 epo_all.oxy.t = epo_all.oxy.t(:,:,1);
 
-%% Add unit of x- and y-axis
-epo_all.deoxy.xUnit = 's';
-epo_all.deoxy.yUnit = 'mmol/L';
-epo_all.oxy.xUnit = 's';
-epo_all.oxy.yUnit = 'mmol/L';
+%% Trial-Average
+epo_all.deoxy = proc_average(epo_all.deoxy, 'Stats', 1);
+epo_all.oxy   = proc_average(epo_all.oxy, 'Stats', 1);
 
 %% Plot figures
 fig_set(3, 'Toolsoff', 0, 'Resize', [1 1.3])
-H= plot_scalpEvolutionPlusChannel(epo_all.deoxy, mnt_vf, {'AFp7','FCC3'}, ival_scalp, defopt_scalp_erp, 'Extrapolation', 0, 'Contour', 0, 'printival', 1, 'Colormap', cmap_posneg(101), 'ColorOrder', [36 120 255; 0 12 183]/255, 'PlotStd', 1, 'yLim', ylim);
+H= plot_scalpEvolutionPlusChannel(epo_all.deoxy, mnt_wg, {'AFp7','FCC3'}, ival_scalp, defopt_scalp_erp, 'GlobalCLim', 0, 'Extrapolation', 0, 'Contour', 0, 'printival', 1, 'Colormap', cmap_posneg(101), 'ColorOrder', [36 120 255; 0 12 183]/255, 'PlotStd', 1, 'yLim', ylim, 'PlotStat', 'sem');
 
 fig_set(4, 'Toolsoff', 0, 'Resize', [1 1.3])
-H= plot_scalpEvolutionPlusChannel(epo_all.oxy, mnt_vf, {'AFp7','FCC3'}, ival_scalp, defopt_scalp_erp, 'Extrapolation', 0, 'Contour', 0, 'printival', 1, 'Colormap', cmap_posneg(101), 'ColorOrder', [242 150 97; 255 0 0]/255, 'PlotStd', 1, 'yLim', ylim, 'CLim', ylim);
+H= plot_scalpEvolutionPlusChannel(epo_all.oxy, mnt_wg, {'AFp7','FCC3'}, ival_scalp, defopt_scalp_erp, 'GlobalCLim', 0, 'Extrapolation', 0, 'Contour', 0, 'printival', 1, 'Colormap', cmap_posneg(101), 'ColorOrder', [242 150 97; 255 0 0]/255, 'PlotStd', 1, 'yLim', ylim, 'PlotStat', 'sem');
 
 
-% fig_set(3, 'Toolsoff', 0, 'Resize', [1 1])
-% H3 = grid_plot(epo.deoxy, mnt, disp_opt, 'ylim', [-0.0003 0.0003]);
-% grid_addBars(epo_r.deoxy, 'Colormap', cmap, 'CLim', clim);
-% 
-% fig_set(4, 'Toolsoff', 0, 'Resize', [1 1])
-% H4 = grid_plot(epo.oxy, mnt, disp_opt, 'ylim', [-0.001 0.001]);
-% grid_addBars(epo_r.oxy, 'Colormap', cmap, 'CLim', clim);
+
