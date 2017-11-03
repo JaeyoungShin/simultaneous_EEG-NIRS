@@ -1,22 +1,18 @@
-% This MATLAB script can be used to reproduce the result of EEG spectral power increase and decrease
-%
+% This MATLAB script can be used to reproduce the hemodynamic response in dataset A (Figure 6)
 % Please download BBCItoolbox to 'MyToolboxDir'
 % Please download dataset to 'NirsMyDataDir' and 'EegMyDataDir'
 % The authors would be grateful if published reports of research using this code
 % (or a modified version, maintaining a significant portion of the original code) would cite the following article:
 % Shin et al. "Simultaneous acquisition of EEG and NIRS during cognitive tasks for an open access dataset",
 % Scientific data (2017), under review.
-% NOTE: Figure may be different from that shown in Shin et al. (2017) because EOG-rejection is not performed.
 
 clear all; clc; close all;
 
 %%%%%%%%%%%%%%%%%%%%%%%% modify directory paths properly %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% MyToolboxDir = fullfile('C:','Users','shin','Documents','MATLAB','bbci_public-master');
 MyToolboxDir = fullfile('C:','Users','shin','Documents','MATLAB','bbci_toolbox_latest_ver');
 WorkingDir = fullfile('C:','Users','shin','Documents','MATLAB','scientific_data');
 NirsMyDataDir = fullfile('F:','scientific_data_publish','rawdata','NIRS');
-
-% EegMyDataDir = fullfile('F:','scientific_data_publish','rawdata','EEG','without EOG');
-EegMyDataDir = fullfile('F:','scientific_data_publish','rawdata','EEG');
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 cd(MyToolboxDir);
@@ -25,61 +21,63 @@ cd(WorkingDir);
 
 addpath(genpath(pwd));
 
-%% initial parameter
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-subdir_list = {'VP001-EEG','VP002-EEG','VP003-EEG','VP004-EEG','VP005-EEG','VP006-EEG','VP007-EEG','VP008-EEG','VP009-EEG','VP010-EEG','VP011-EEG','VP012-EEG','VP013-EEG','VP014-EEG','VP015-EEG','VP016-EEG','VP017-EEG','VP018-EEG','VP019-EEG','VP020-EEG','VP021-EEG','VP022-EEG','VP023-EEG','VP024-EEG','VP025-EEG','VP026-EEG'};
-ival_epo = [-15 60]*1000;
-ival_base  = [-5 -2]*1000;
+%%%%%%%%%%%%%%%%% initial parameter %%%%%%%%%%%%%%%%%
+subdir_list = {'VP001-NIRS','VP002-NIRS','VP003-NIRS','VP004-NIRS','VP005-NIRS','VP006-NIRS','VP007-NIRS','VP008-NIRS','VP009-NIRS','VP010-NIRS','VP011-NIRS','VP012-NIRS','VP013-NIRS','VP014-NIRS','VP015-NIRS','VP016-NIRS','VP017-NIRS','VP018-NIRS','VP019-NIRS','VP020-NIRS','VP021-NIRS','VP022-NIRS','VP023-NIRS','VP024-NIRS','VP025-NIRS','VP026-NIRS'};
+ival_epo  = [-5 60]*1000; % epoch range (unit: msec)
+ival_base = [-5 -2]*1000; % baseline correction range (unit: msec)
+ival_scalp = [0 10; 10 20; 20 30; 30 40; 40 60]*1000;
+ylim = [-2 2]*1e-3;
+load cmap_asymmetry; % see cmap_asymmetry in github
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-% for ERSP calculation
-fc = [1 40];
-cycles = 0; 
-clim = [-3 3]; 
-
-% subplot index for EEG channels
-subplotIdx = [4 12 14 13 20 22 28 30 32 38 40 46 48 50 59 58 6 16 15 24 26 34 36 42 44 52 54 60];
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
+%% Load NIRS data
 for vp = 1 : length(subdir_list)
     
-    % load EEG data
-    loadDir = fullfile(EegMyDataDir,subdir_list{vp});
+    disp([subdir_list{vp}, ' was started']);
+    loadDir = fullfile(NirsMyDataDir,subdir_list{vp});
     cd(loadDir);
-    load cnt_dsr; load mrk_dsr; load mnt_dsr;
+    load cnt_nback; load mrk_nback; load mnt_nback;
     cd(WorkingDir);
     
-    % marker selection: session (ssn)
-    mrk_ssn = mrk_selectClasses(mrk_dsr, 'session');
-       
-    % segmentation: session (ssn)
-    ssn = proc_segmentation(cnt_dsr, mrk_ssn, ival_epo); % 0-back
+    % low-pass filter
+    [b,a] = butter(3, 0.2/cnt_nback.deoxy.fs*2, 'low');
+    cnt_nback.deoxy = proc_filtfilt(cnt_nback.deoxy, b, a);
+    cnt_nback.oxy   = proc_filtfilt(cnt_nback.oxy, b, a);
     
-    % manipulation for EEGLAB compatible format
-    ssn.x1 = permute(ssn.x, [2, 1, 3]); % nch x nsamples x ntrials
+    % segmentation
+    epo.deoxy = proc_segmentation(cnt_nback.deoxy, mrk_nback, ival_epo);
+    epo.oxy   = proc_segmentation(cnt_nback.oxy,   mrk_nback, ival_epo);
     
-    for ch = 1 : length(mnt_dsr.clab)-2 % exclude two EOG channels
-        chdata = ssn.x1(ch,:,:);
-        
-        [ersp(:,:,ch,vp),itc,powbase,times,freqs,erspboot,itcboot] =...
-            newtimef(chdata, size(ssn.x1,2), ival_epo, ssn.fs, cycles,...
-            'type','phasecoher','freqs',fc,'plotitc','off','plotersp','off',...
-            'baseline', ival_base,'trialbase','full','rmerp','on');
-    end   
+    % Add unit of x- and y-axis
+    epo.deoxy.xUnit = 's';
+    epo.deoxy.yUnit = 'mmol/L';
+    epo.oxy.xUnit = 's';
+    epo.oxy.yUnit = 'mmol/L';
+
+    if vp == 1
+        epo_all.deoxy = epo.deoxy;
+        epo_all.oxy   = epo.oxy;
+    else
+        epo_all.deoxy = proc_appendEpochs(epo_all.deoxy, epo.deoxy);
+        epo_all.oxy   = proc_appendEpochs(epo_all.oxy,   epo.oxy);
+    end
 end
 
-%% average ERSP over multiple participants
-% ave_0back: [time x freq x ch x participant]
-ave_dsr = mean(ersp,4);
+%% Baseline correction
+epo_all.deoxy = proc_baseline(epo_all.deoxy, ival_base);
+epo_all.oxy   = proc_baseline(epo_all.oxy, ival_base);
 
-%% plot ERSP
-clab = cnt_dsr.clab;
- 
-figure(1)
-for ch = 1 : length(clab)-2
-    subplot(7,9,subplotIdx(ch));
-    imagesc(times/1000,freqs,ave_dsr(:,:,ch), clim); title(clab{ch});
-    set(gca, 'YDir','normal'); ylim([1 40]); colormap(cmap_posneg(101));
-end
-colorbar('OuterPosition', [0.645 0.828 0.016 0.09]);
+%% Dimensionality correction
+epo_all.deoxy.t = epo_all.deoxy.t(:,:,1);
+epo_all.oxy.t = epo_all.oxy.t(:,:,1);
 
-rmpath(genpath(pwd));
+%% Trial-Average
+epo_all.deoxy = proc_average(epo_all.deoxy, 'Stats', 1);
+epo_all.oxy   = proc_average(epo_all.oxy, 'Stats', 1);
+
+%% Plot figures
+fig_set(3, 'Toolsoff', 0, 'Resize', [1 2]);
+plot_scalpEvolutionPlusChannel(epo_all.deoxy, mnt_nback, {'AF7','C3h'}, ival_scalp, defopt_scalp_erp, 'GlobalCLim', 0, 'Extrapolation', 0, 'Contour', 0, 'ColorOrder', [0 216 255; 0 84 255; 95 0 255]/255, 'printival', 1, 'Colormap', cmap_asymmetry, 'yLim', ylim, 'CLim', [-1 0.75]*0.001, 'PlotStat', 'sem');
+
+fig_set(4, 'Toolsoff', 0, 'Resize', [1 2]);
+plot_scalpEvolutionPlusChannel(epo_all.oxy, mnt_nback, {'AF7','C3h'}, ival_scalp, defopt_scalp_erp, 'GlobalCLim', 0, 'Extrapolation', 0, 'Contour', 0, 'ColorOrder', [255 167 167; 255 148 54; 255 0 0]/255,'printival', 1, 'Colormap', cmap_asymmetry, 'yLim', ylim, 'CLim', [-2 4/3]*0.001, 'PlotStat', 'sem');
