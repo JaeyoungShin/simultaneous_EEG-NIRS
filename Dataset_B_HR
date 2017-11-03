@@ -9,7 +9,7 @@
 clear all; clc; close all;
 
 %%%%%%%%%%%%%%%%%%%%%%%% modify directory paths properly %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-MyToolboxDir = fullfile('C:','Users','shin','Documents','MATLAB','bbci_public-master');
+MyToolboxDir = fullfile('C:','Users','shin','Documents','MATLAB','bbci_toolbox_latest_ver');
 WorkingDir = fullfile('C:','Users','shin','Documents','MATLAB','scientific_data');
 NirsMyDataDir = fullfile('F:','scientific_data_publish','rawdata','NIRS');
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -32,18 +32,24 @@ for vp = 1 : length(subdir_list)
     disp([subdir_list{vp}, ' was started']);
     loadDir = fullfile(NirsMyDataDir,subdir_list{vp});
     cd(loadDir);
-    load cnt_gonogo; load mrk_gonogo; load mnt_gonogo;
+    load cnt_dsr; load mrk_dsr; load mnt_dsr;
     cd(WorkingDir);
    
     % low-pass filter
-    [b,a] = butter(3, 0.2/cnt_gonogo.deoxy.fs*2, 'low');
-    cnt_gonogo.deoxy = proc_filtfilt(cnt_gonogo.deoxy, b, a);
-    cnt_gonogo.oxy   = proc_filtfilt(cnt_gonogo.oxy, b, a);
+    [b,a] = butter(3, 0.2/cnt_dsr.deoxy.fs*2, 'low');
+    cnt_dsr.deoxy = proc_filtfilt(cnt_dsr.deoxy, b, a);
+    cnt_dsr.oxy   = proc_filtfilt(cnt_dsr.oxy, b, a);
                
     % segmentation
-    epo.deoxy = proc_segmentation(cnt_gonogo.deoxy, mrk_gonogo, ival_epo);
-    epo.oxy   = proc_segmentation(cnt_gonogo.oxy, mrk_gonogo, ival_epo);
-       
+    epo.deoxy = proc_segmentation(cnt_dsr.deoxy, mrk_dsr, ival_epo);
+    epo.oxy   = proc_segmentation(cnt_dsr.oxy, mrk_dsr, ival_epo);
+    
+    % Add unit of x- and y-axis for preventing warning message
+    epo.deoxy.xUnit = 'ms';
+    epo.deoxy.yUnit = 'mmol/L';
+    epo.oxy.xUnit = 'ms';
+    epo.oxy.yUnit = 'mmol/L';
+   
     if vp == 1
         epo_all.deoxy = epo.deoxy;
         epo_all.oxy   = epo.oxy;
@@ -61,15 +67,14 @@ epo_all.oxy   = proc_baseline(epo_all.oxy, ival_base);
 epo_all.deoxy.t = epo_all.deoxy.t(:,:,1);
 epo_all.oxy.t = epo_all.oxy.t(:,:,1);
 
-%% Add unit of x- and y-axis
-epo_all.deoxy.xUnit = 's';
-epo_all.deoxy.yUnit = 'mmol/L';
-epo_all.oxy.xUnit = 's';
-epo_all.oxy.yUnit = 'mmol/L';
+%% Trial-Average
+epo_all.deoxy = proc_average(epo_all.deoxy, 'Stats', 1);
+epo_all.oxy   = proc_average(epo_all.oxy, 'Stats', 1);
 
-%% Plot figures
+%% Plot Figures
+% Customized CLim valu is not supported by default. If you want to use a customized CLim value, please use the modified 'visutil_getCommonRange' file  uploaded on the github
+
 fig_set(3, 'Toolsoff', 0);
-plot_scalpEvolutionPlusChannel(epo_all.deoxy, mnt_gonogo, {'AF2','CCP3'}, ival_scalp, defopt_scalp_erp, 'Extrapolation', 0, 'Contour', 0, 'printival', 1, 'YUnit', 'mmol/L', 'Colormap', cmap_posneg(101), 'ColorOrder', [0 0 1], 'yLim', ylim, 'CLim', [-3 3]*1e-4, 'PlotStd', 1);
-
+plot_scalpEvolutionPlusChannel(epo_all.deoxy, mnt_dsr, {'AF2','CCP3'}, ival_scalp, defopt_scalp_erp, 'GlobalCLim', 0, 'Extrapolation', 0, 'Contour', 0, 'printival', 1, 'YUnit', 'mmol/L', 'Colormap', cmap_posneg(101), 'ColorOrder', [0 0 1], 'yLim', ylim, 'CLim', [-3 3]*1e-4, 'PlotStat', 'sem'); 
 fig_set(4, 'Toolsoff', 0);
-plot_scalpEvolutionPlusChannel(epo_all.oxy, mnt_gonogo, {'AF2','CCP3'}, ival_scalp, defopt_scalp_erp, 'Extrapolation', 0, 'Contour', 0, 'printival', 1, 'YUnit', 'mmol/L', 'Colormap', cmap_posneg(101), 'ColorOrder', [1 0 0], 'yLim', ylim, 'CLim', [-8 8]*1e-4, 'PlotStd', 1);
+plot_scalpEvolutionPlusChannel(epo_all.oxy, mnt_dsr, {'AF2','CCP3'}, ival_scalp, defopt_scalp_erp, 'GlobalCLim', 0, 'Extrapolation', 0, 'Contour', 0, 'printival', 1, 'YUnit', 'mmol/L', 'Colormap', cmap_posneg(101), 'ColorOrder', [1 0 0], 'yLim', ylim, 'CLim', [-8 8]*1e-4, 'PlotStat', 'sem');
