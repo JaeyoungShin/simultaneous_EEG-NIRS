@@ -6,6 +6,10 @@ The authors would be grateful if published reports of research using this code (
 Shin, Jaeyoung, et al. "Simultaneous acquisition of EEG and NIRS during cognitive tasks for an open access dataset", _Scientific data (2017), under review_.
 
 # Caution
+Figures and Results may be different from those shown in Shin et al. (2017) because:
+1. some visulization options are different.
+2. EOG-rejection is not performed.
+
 Data processing was performed using MATLAB 2013b.
 Please use MATLAB 2013b or older version. 
 
