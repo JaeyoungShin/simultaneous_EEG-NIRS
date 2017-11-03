@@ -15,7 +15,7 @@ We cannot guarantee if MATLAB scripts works properly.
 
 - For NIRS data conversion, please download 'proc_BeerLambert.m' here and overwrite it to the corresponding subfolder in BBCI toolbox.
 - For the use of customized values of 'CLim', please download 'visutil_getCommonRange.m' here and overwrite it to the corresponding subfolder in BBCI toolbox.
-- Please download 'plot_scalpEvolutionPlusChannel.m' here and overwrite to the corresponding subfolder in BBCI toolbox.
+- Please download 'plot_scalpEvolutionPlusChannel.m' here and overwrite it to the corresponding subfolder in BBCI toolbox.
 
 # Basic Data Structures
 This document is from https://github.com/bbci/bbci_public/blob/master/doc/ToolboxData.markdown and partly modified.
