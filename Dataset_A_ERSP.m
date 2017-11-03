@@ -6,6 +6,7 @@
 % (or a modified version, maintaining a significant portion of the original code) would cite the following article:
 % Shin et al. "Simultaneous acquisition of EEG and NIRS during cognitive tasks for an open access dataset",
 % Scientific data (2017), under review.
+% NOTE: Figure may be different from that shown in Shin et al. (2017) because EOG-rejection is not performed.
 %
 % marker information
 % [16, 48, 64, 80, 96, 112, 128, 144] = [0-back target, 2-back target, 2-back non-target, 3-back target, 3-back non-target, 0-back session start, 2-back session start, 3-back session start
