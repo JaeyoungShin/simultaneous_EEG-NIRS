@@ -24,7 +24,7 @@ clab = {'AF7oxy','AFF5oxy','AFp7oxy','AF5hoxy','AFp3oxy','AFF3hoxy','AF1oxy','AF
         'AF7deoxy','AFF5deoxy','AFp7deoxy','AF5hdeoxy','AFp3deoxy','AFF3hdeoxy','AF1deoxy','AFFzdeoxy','AFpzdeoxy','AF2deoxy','AFp4deoxy','FCC3deoxy','C3hdeoxy','C5hdeoxy','CCP3deoxy','CPP3deoxy','P3hdeoxy','P5hdeoxy',...
         'PPO3deoxy','AFF4hdeoxy','AF6hdeoxy','AFF6deoxy','AFp8deoxy','AF8deoxy','FCC4deoxy','C6hdeoxy','C4hdeoxy','CCP4deoxy','CPP4deoxy','P6hdeoxy','P4hdeoxy','PPO4deoxy','PPOzdeoxy','PO1deoxy','PO2deoxy','POOzdeoxy'};
 
-stimDef.datasetA = {7, 8, 9; '0-back session','2-back session','3-back session'};
+stimDef.datasetA = {7, 8, 9; '0-back series','2-back series','3-back series'};
 stimDef.datasetB = {3; 'session'};
 stimDef.datasetC = {1, 2; 'WG','BL'};
 
