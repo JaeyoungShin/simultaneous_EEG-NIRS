@@ -3,7 +3,7 @@ Tutorial for data processing for Simultaneous acquisition of EEG and NIRS during
 
 The authors would be grateful if published reports of research using this code (or a modified version, maintaining a significant portion of the original code) would cite the following article:
 
-Shin, Jaeyoung, et al. "Simultaneous acquisition of EEG and NIRS during cognitive tasks for an open access dataset", _Scientific data (2017), under review_.
+Shin, Jaeyoung, et al. "Simultaneous acquisition of EEG and NIRS during cognitive tasks for an open access dataset", _Scientific data (2017), February 2018_.
 
 # Caution
 Figures and Results may be different from those shown in Shin et al. (2017) because:
